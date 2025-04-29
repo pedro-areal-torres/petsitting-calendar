@@ -3,7 +3,6 @@ import './globals.css';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Routes } from '@/modules/common/types/routes';
-import { Toaster } from '@/components/ui/sonner';
 
 export const metadata: Metadata = {
   title: 'Pet sitting calendar',
@@ -25,18 +24,15 @@ export default function RootLayout({
                 <Image alt='Logo' src='/logo.png' width={30} height={30} />
               </div>
             </div>
-            {/* 
             <div className='flex flex-1 justify-end'>
               <Link href={Routes.login} className='text-sm/6 font-semibold text-gray-900'>
                 Log in <span aria-hidden='true'>&rarr;</span>
               </Link>
-            </div> 
-            */}
+            </div>
           </nav>
         </header>
 
         {children}
-        <Toaster />
       </body>
     </html>
   );
