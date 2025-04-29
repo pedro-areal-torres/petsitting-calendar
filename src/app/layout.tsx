@@ -15,7 +15,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='en'>
-      <body className='bg-gradient-to-t from-violet-100 to-fuchsia-50'>
+      <body className='h-screen bg-gradient-to-t from-violet-100 to-fuchsia-50'>
         <header className='absolute inset-x-0 top-0 z-50'>
           <nav aria-label='global' className='flex items-center justify-between p-6 lg:px-8'>
             <div className='flex lg:flex-1'>
@@ -24,11 +24,13 @@ export default function RootLayout({
                 <Image alt='Logo' src='/logo.png' width={30} height={30} />
               </div>
             </div>
-            <div className='flex flex-1 justify-end'>
+            {/*  
+           <div className='flex flex-1 justify-end'>
               <Link href={Routes.login} className='text-sm/6 font-semibold text-gray-900'>
                 Log in <span aria-hidden='true'>&rarr;</span>
               </Link>
-            </div>
+            </div> 
+            */}
           </nav>
         </header>
 
