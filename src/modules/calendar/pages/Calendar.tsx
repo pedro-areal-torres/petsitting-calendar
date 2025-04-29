@@ -63,9 +63,7 @@ export default function Calendar({ events }: Props) {
   return (
     <div className='flex h-full flex-col justify-center p-2 lg:pt-20'>
       <header className='flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none'>
-        <h1 className='text-base font-semibold text-gray-900'>
-          {format(currentMonth, 'MMMM yyyy')}
-        </h1>
+        <h1 className='text-base font-semibold text-gray-900'>{currentMonth}</h1>
         <div className='flex items-center'>
           <div className='relative flex items-center rounded-md bg-white shadow-xs md:items-stretch'>
             <button
