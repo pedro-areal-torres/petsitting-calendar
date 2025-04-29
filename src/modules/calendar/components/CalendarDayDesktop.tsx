@@ -1,4 +1,4 @@
-import { Events } from '@/modules/actions/get-all-events';
+import { Events } from '@/modules/calendar/actions/get-all-events';
 
 interface Props {
   day: number;

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { Events } from '@/modules/actions/get-all-events';
+import { Events } from '@/modules/calendar/actions/get-all-events';
 import { cn } from '@/modules/common/lib/tw-merge';
 import { ChevronLeftIcon, ChevronRightIcon, ClockIcon } from '@heroicons/react/20/solid';
 import {
@@ -21,6 +21,7 @@ import {
   sub,
 } from 'date-fns';
 import { Paw } from '../components/icons/Paw';
+import { getHourMinuteFromTime } from '../utils/get-hour-minute-from-time';
 
 interface Props {
   events: Events;
@@ -116,118 +117,124 @@ export default function Calendar({ events }: Props) {
           <div
             className={`hidden w-full lg:grid lg:grid-cols-7 lg:grid-rows-${getWeeksInMonth(currentMonth)} lg:gap-px`}
           >
-            {days.map((day, dayIdx) => (
-              <div
-                key={day.toString()}
-                className={cn(
-                  isSameMonth(day, firstDayCurrentMonth) ? 'bg-white' : 'bg-gray-50 text-gray-500',
-                  'relative px-3 py-2',
-                  dayIdx === 0 && colStartClasses[getDay(day)],
-                )}
-              >
-                <time
-                  dateTime={format(today, 'dd MM yyyy')}
-                  className={
-                    isToday(day)
-                      ? 'flex size-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white'
-                      : undefined
-                  }
+            {days.map((day, dayIdx) => {
+              const dayEvent = events.find((event) => isSameDay(event.date, day));
+              return (
+                <div
+                  key={day.toString()}
+                  className={cn(
+                    isSameMonth(day, firstDayCurrentMonth)
+                      ? 'bg-white'
+                      : 'bg-gray-50 text-gray-500',
+
+                    'relative px-3 py-2',
+                    dayIdx === 0 && colStartClasses[getDay(day)],
+                    dayEvent?.status === 'unavailable' && 'bg-red-300',
+                    dayEvent?.status === 'unknown' && 'bg-yellow-200',
+                  )}
                 >
-                  {format(day, 'd')}
-                </time>
-                <ol className='mt-2'>
-                  {events
-                    .filter((event) => isSameDay(event.date, day))
-                    .map((event) => (
-                      <li key={event.date}>
+                  <time
+                    dateTime={format(today, 'dd MM yyyy')}
+                    className={
+                      isToday(day)
+                        ? 'flex size-6 items-center justify-center rounded-full bg-indigo-600 font-semibold text-white'
+                        : undefined
+                    }
+                  >
+                    {format(day, 'd')}
+                  </time>
+                  <ol className='mt-2'>
+                    {dayEvent?.bookings.map((booking) => (
+                      <li key={booking.id}>
                         <div className='group flex'>
                           <p className='flex-auto truncate font-medium text-gray-900 group-hover:text-indigo-600'>
-                            booking
+                            {booking.pet.name}
                           </p>
                           <time
-                            dateTime={event.date}
+                            dateTime={dayEvent.date}
                             className='ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block'
                           >
-                            OK
-                            {/* {format(event.bookings.startTime, 'hh:mm')} */}
+                            {booking.startTime.slice(0, 5)}
                           </time>
                         </div>
                       </li>
                     ))}
-                </ol>
-              </div>
-            ))}
+                  </ol>
+                </div>
+              );
+            })}
           </div>
           <div
             className={`isolate grid w-full grid-cols-7 gap-px lg:hidden grid-rows-${getWeeksInMonth(currentMonth)}`}
           >
-            {days.map((day, dayIdx) => (
-              <button
-                type='button'
-                key={day.toString()}
-                onClick={() => setSelectedDay(day)}
-                className={cn(
-                  isSameMonth(day, firstDayCurrentMonth) ? 'bg-white' : 'bg-gray-50',
-                  (isEqual(day, selectedDay) || isToday(day)) && 'font-semibold',
-                  isEqual(day, selectedDay) && 'text-white',
-                  !isEqual(day, selectedDay) && isToday(day) && 'text-indigo-600',
-                  !isEqual(day, selectedDay) &&
-                    isSameMonth(day, firstDayCurrentMonth) &&
-                    !isToday(day) &&
-                    'text-gray-900',
-                  !isEqual(day, selectedDay) &&
-                    !isSameMonth(day, firstDayCurrentMonth) &&
-                    !isToday(day) &&
-                    'text-gray-500',
-                  'flex h-14 flex-col items-center px-3 py-2 hover:bg-gray-100 focus:z-10',
-                  dayIdx === 0 && colStartClasses[getDay(day)],
-                )}
-              >
-                <time
-                  dateTime={format(today, 'dd MM yyyy')}
+            {days.map((day, dayIdx) => {
+              const dayEvent = events.find((event) => isSameDay(day, event.date));
+
+              return (
+                <button
+                  type='button'
+                  key={day.toString()}
+                  onClick={() => setSelectedDay(day)}
                   className={cn(
-                    isEqual(day, selectedDay) &&
-                      'flex size-6 items-center justify-center rounded-full',
-                    isEqual(day, selectedDay) && isToday(day) && 'bg-indigo-600',
-                    isEqual(day, selectedDay) && !isToday(day) && 'bg-gray-900',
-                    'ml-auto',
+                    isSameMonth(day, firstDayCurrentMonth) ? 'bg-white' : 'bg-gray-50',
+                    (isEqual(day, selectedDay) || isToday(day)) && 'font-semibold',
+                    isEqual(day, selectedDay) && 'text-white',
+                    !isEqual(day, selectedDay) && isToday(day) && 'text-indigo-600',
+                    !isEqual(day, selectedDay) &&
+                      isSameMonth(day, firstDayCurrentMonth) &&
+                      !isToday(day) &&
+                      'text-gray-900',
+                    !isEqual(day, selectedDay) &&
+                      !isSameMonth(day, firstDayCurrentMonth) &&
+                      !isToday(day) &&
+                      'text-gray-500',
+                    'flex h-14 flex-col items-center px-3 py-2 hover:bg-gray-100 focus:z-10',
+                    dayIdx === 0 && colStartClasses[getDay(day)],
+                    dayEvent?.status === 'unavailable' && 'bg-red-300',
+                    dayEvent?.status === 'unknown' && 'bg-yellow-200',
                   )}
                 >
-                  {format(day, 'd')}
-                </time>
-                {events
-                  .filter((event) => isSameDay(day, event.date))
-                  .map((event) => (
-                    <span className='-mx-0.5 mt-auto flex flex-wrap-reverse' key={event.date}>
-                      {event.bookings.map((booking) => (
-                        <Paw key={booking.petId} className='text-black' />
-                      ))}
+                  <time
+                    dateTime={format(today, 'dd MM yyyy')}
+                    className={cn(
+                      isEqual(day, selectedDay) &&
+                        'flex size-6 items-center justify-center rounded-full',
+                      isEqual(day, selectedDay) && isToday(day) && 'bg-indigo-600',
+                      isEqual(day, selectedDay) && !isToday(day) && 'bg-gray-900',
+                      'ml-auto',
+                    )}
+                  >
+                    {format(day, 'd')}
+                  </time>
+                  {dayEvent?.bookings.map((booking) => (
+                    <span className='-mx-0.5 mt-auto flex flex-wrap-reverse' key={booking.id}>
+                      <Paw key={booking.petId} className='text-black' />
                     </span>
                   ))}
-              </button>
-            ))}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
       {events
-        .filter((event) => isSameDay(selectedDay, event.date))
-        .map((event) =>
-          event.bookings.map((booking) => (
-            <div className='px-4 py-10 sm:px-6 lg:hidden' key={booking.id}>
-              <ol className='divide-y divide-gray-100 overflow-hidden rounded-lg bg-white text-sm shadow-sm ring-1 ring-black/5'>
-                <li className='group flex p-4 pr-6 focus-within:bg-gray-50 hover:bg-gray-50'>
-                  <div className='flex-auto'>
-                    <p className='font-semibold text-gray-900'>{booking.pet.name}</p>
-                    <time dateTime={event.date} className='mt-2 flex items-center text-gray-700'>
-                      <ClockIcon className='mr-2 size-5 text-gray-400' aria-hidden='true' />
-                      {booking.startTime} - {booking.endTime}
-                    </time>
-                  </div>
-                </li>
-              </ol>
-            </div>
-          )),
-        )}
+        .find((event) => isSameDay(selectedDay, event.date))
+        ?.bookings.map((booking) => (
+          <div className='py-4 sm:px-6 lg:hidden' key={booking.id}>
+            <ol className='divide-y divide-gray-100 overflow-hidden rounded-lg bg-white text-sm shadow-sm ring-1 ring-black/5'>
+              <li className='group flex p-4 pr-6 focus-within:bg-gray-50 hover:bg-gray-50'>
+                <div className='flex w-full flex-row items-center justify-between'>
+                  <p className='font-semibold text-gray-900'>{booking.pet.name}</p>
+                  <time className='flex items-center text-gray-400'>
+                    <ClockIcon className='mr-2 size-5' aria-hidden='true' />
+                    {`${getHourMinuteFromTime(booking.startTime)} - 
+                    ${getHourMinuteFromTime(booking.endTime)}`}
+                  </time>
+                </div>
+              </li>
+            </ol>
+          </div>
+        ))}
     </div>
   );
 }
