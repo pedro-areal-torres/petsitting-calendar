@@ -24,13 +24,11 @@ export default function RootLayout({
                 <Image alt='Logo' src='/logo.png' width={30} height={30} />
               </div>
             </div>
-            {/*  
-           <div className='flex flex-1 justify-end'>
+            <div className='hidden flex-1 justify-end'>
               <Link href={Routes.login} className='text-sm/6 font-semibold text-gray-900'>
                 Log in <span aria-hidden='true'>&rarr;</span>
               </Link>
-            </div> 
-            */}
+            </div>
           </nav>
         </header>
 
