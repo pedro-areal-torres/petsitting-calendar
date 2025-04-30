@@ -1,69 +1,46 @@
 'use client';
 
-import { useState } from 'react';
 import { Events } from '@/modules/calendar/actions/get-all-events';
 import { cn } from '@/modules/common/lib/tw-merge';
 import { ChevronLeftIcon, ChevronRightIcon, ClockIcon } from '@heroicons/react/20/solid';
 import {
-  add,
-  eachDayOfInterval,
-  endOfMonth,
   format,
   getDay,
   getMonth,
   getWeeksInMonth,
+  isBefore,
   isEqual,
   isSameDay,
   isSameMonth,
   isToday,
-  parse,
-  startOfToday,
-  sub,
 } from 'date-fns';
 import { Paw } from '../components/icons/Paw';
 import { getHourMinuteFromTime } from '../utils/get-hour-minute-from-time';
+import { useCalendar } from '../hooks/useCalendar';
 
 interface Props {
   events: Events;
 }
 
-const colStartClasses = [
-  'col-start-7',
-  '',
-  'col-start-2',
-  'col-start-3',
-  'col-start-4',
-  'col-start-5',
-  'col-start-6',
-];
-
 export default function Calendar({ events }: Props) {
-  const today = startOfToday();
-
-  const [selectedDay, setSelectedDay] = useState(today);
-  const [currentMonth, setCurrentMonth] = useState(format(today, 'MMM-yyyy'));
-
-  const firstDayCurrentMonth = parse(currentMonth, 'MMM-yyyy', new Date());
-
-  const days = eachDayOfInterval({
-    start: firstDayCurrentMonth,
-    end: endOfMonth(firstDayCurrentMonth),
-  });
-
-  const nextMonth = () => {
-    const firstDayNextMonth = add(firstDayCurrentMonth, { months: 1 });
-    setCurrentMonth(format(firstDayNextMonth, 'MMM-yyyy'));
-  };
-
-  const previousMonth = () => {
-    const firstDayPreviousMonth = sub(firstDayCurrentMonth, { months: 1 });
-    setCurrentMonth(format(firstDayPreviousMonth, 'MMM-yyyy'));
-  };
+  const {
+    today,
+    currentMonth,
+    firstDayCurrentMonth,
+    previousMonth,
+    nextMonth,
+    selectedDay,
+    setSelectedDay,
+    days,
+    colStartClasses,
+  } = useCalendar();
 
   return (
     <div className='flex h-full flex-col justify-center p-2 lg:pt-20'>
       <header className='flex items-center justify-between border-b border-gray-200 px-6 py-4 lg:flex-none'>
-        <h1 className='text-base font-semibold text-gray-900'>{currentMonth}</h1>
+        <h1 className='text-base font-semibold text-gray-900'>
+          {format(currentMonth, 'MMM-yyyy')}
+        </h1>
         <div className='flex items-center'>
           <div className='relative flex items-center rounded-md bg-white shadow-xs md:items-stretch'>
             <button
@@ -152,7 +129,8 @@ export default function Calendar({ events }: Props) {
                             dateTime={dayEvent.date}
                             className='ml-3 hidden flex-none text-gray-500 group-hover:text-indigo-600 xl:block'
                           >
-                            {booking.startTime.slice(0, 5)}
+                            {`${getHourMinuteFromTime(booking.startTime)} - 
+                    ${getHourMinuteFromTime(booking.endTime)}`}
                           </time>
                         </div>
                       </li>
@@ -190,6 +168,7 @@ export default function Calendar({ events }: Props) {
                     dayIdx === 0 && colStartClasses[getDay(day)],
                     dayEvent?.status === 'unavailable' && 'bg-red-300',
                     dayEvent?.status === 'unknown' && 'bg-yellow-200',
+                    isBefore(day, today) && 'bg-gray-100',
                   )}
                 >
                   <time
@@ -199,7 +178,6 @@ export default function Calendar({ events }: Props) {
                         'flex size-6 items-center justify-center rounded-full',
                       isEqual(day, selectedDay) && isToday(day) && 'bg-indigo-600',
                       isEqual(day, selectedDay) && !isToday(day) && 'bg-gray-900',
-                      'ml-auto',
                     )}
                   >
                     {format(day, 'd')}
@@ -215,10 +193,20 @@ export default function Calendar({ events }: Props) {
           </div>
         </div>
       </div>
+      <div className='flex flex-row items-center justify-center gap-4 pt-2'>
+        <div className='flex flex-row items-center justify-center gap-1'>
+          <span className='h-4 w-4 rounded-full border bg-yellow-200' />
+          <p className='text-sm'>Unknown</p>
+        </div>
+        <div className='flex flex-row items-center justify-center gap-1'>
+          <span className='h-4 w-4 rounded-full border bg-red-300' />
+          <p className='text-sm'>Unavailable / Fully booked</p>
+        </div>
+      </div>
       {events
         .find((event) => isSameDay(selectedDay, event.date))
         ?.bookings.map((booking) => (
-          <div className='py-4 sm:px-6 lg:hidden' key={booking.id}>
+          <div className='py-2 sm:px-6 lg:hidden' key={booking.id}>
             <ol className='divide-y divide-gray-100 overflow-hidden rounded-lg bg-white text-sm shadow-sm ring-1 ring-black/5'>
               <li className='group flex p-4 pr-6 focus-within:bg-gray-50 hover:bg-gray-50'>
                 <div className='flex w-full flex-row items-center justify-between'>
