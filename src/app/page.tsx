@@ -6,3 +6,5 @@ export default async function Home() {
 
   return <Calendar events={events} />;
 }
+
+export const revalidate = 60;
