@@ -14,9 +14,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang='en'>
-      <body className='h-screen bg-gradient-to-t from-violet-100 to-fuchsia-50'>
-        <header className='absolute inset-x-0 top-0 z-50'>
+    <html lang='en' className='h-full'>
+      <body className='flex min-h-full flex-col bg-gradient-to-t from-violet-100 to-fuchsia-50'>
+        <header>
           <nav aria-label='global' className='flex items-center justify-between p-6 lg:px-8'>
             <div className='flex lg:flex-1'>
               <div className='-m-1.5 p-1.5'>
@@ -31,8 +31,7 @@ export default function RootLayout({
             </div>
           </nav>
         </header>
-
-        {children}
+        <main className='grow'>{children}</main>
       </body>
     </html>
   );
