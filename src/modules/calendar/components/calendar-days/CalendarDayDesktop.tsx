@@ -4,6 +4,7 @@ import {
   format,
   getDay,
   getWeeksInMonth,
+  isBefore,
   isSameDay,
   isSameMonth,
   isToday,
@@ -42,6 +43,7 @@ export default function CalendarDayDesktop({ days, events }: Props) {
               dayIdx === 0 && colStartClasses[getDay(day)],
               dayEvent?.status === 'unavailable' && 'bg-red-300',
               dayEvent?.status === 'unknown' && 'bg-yellow-200',
+              isBefore(day, today) && 'bg-gray-100',
             )}
           >
             <time
