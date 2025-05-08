@@ -22,7 +22,7 @@ export default function Calendar({ events }: Props) {
         <div className='grid grid-cols-7 gap-px border-b border-gray-300 bg-gray-200 text-center text-xs/6 font-semibold text-gray-700 lg:flex-none'>
           {WEEKDAYS.map((day) => (
             <div key={day} className='bg-white py-2'>
-              {day.charAt(0)}
+              <span className='block sm:hidden'>{day.charAt(0)}</span>
               <span className='sr-only sm:not-sr-only'>{day}</span>
             </div>
           ))}
