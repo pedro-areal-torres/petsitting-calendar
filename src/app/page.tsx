@@ -11,5 +11,3 @@ export default async function Home() {
     </CalendarProvider>
   );
 }
-
-export const revalidate = 60;
