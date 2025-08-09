@@ -11,3 +11,5 @@ export default async function Home() {
     </CalendarProvider>
   );
 }
+
+export const dynamic = 'force-dynamic';
