@@ -35,7 +35,7 @@ export default function Calendar({ events }: Props) {
       <div className='flex flex-row items-center justify-center gap-4 py-2'>
         <div className='flex flex-row items-center justify-center gap-1'>
           <span className='h-4 w-4 rounded-full border bg-yellow-200' />
-          <p className='text-sm'>Unknown</p>
+          <p className='text-sm'>Check availability</p>
         </div>
         <div className='flex flex-row items-center justify-center gap-1'>
           <span className='h-4 w-4 rounded-full border bg-red-300' />
